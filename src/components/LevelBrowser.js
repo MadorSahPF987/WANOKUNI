@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Home, ArrowLeft, ArrowRight, Grid, List, Search, X, Info } from 'lucide-react';
 import ItemDetailModal from './ItemDetailModal';
-import DevPanel from './DevPanel';
 import { useHiraganaInput, convertRomajiToHiragana } from '../utils/romajiConverter';
 
 const LevelBrowser = ({ wanoKuniData, onBack, onNavigate, srs }) => {
@@ -16,11 +15,6 @@ const LevelBrowser = ({ wanoKuniData, onBack, onNavigate, srs }) => {
   const [searchHiragana, handleSearchHiraganaChange, setSearchHiragana] = useHiraganaInput('');
   const [searchRomaji, setSearchRomaji] = useState('');
   const [searchResults, setSearchResults] = useState([]);
-
-  // Force refresh function for dev panel
-  const handleRefresh = () => {
-    window.location.reload();
-  };
 
   // Utiliser la fonction utilitaire pour la conversion
   const romajiToHiragana = React.useCallback((romaji) => {
@@ -1162,12 +1156,6 @@ const LevelBrowser = ({ wanoKuniData, onBack, onNavigate, srs }) => {
           />
         )}
 
-        {/* Dev Panel */}
-        <DevPanel 
-          srs={srs}
-          wanoKuniData={wanoKuniData}
-          onRefresh={handleRefresh}
-        />
       </div>
     </div>
   );

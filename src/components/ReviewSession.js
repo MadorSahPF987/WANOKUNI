@@ -2,7 +2,6 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { Home, ChevronRight, Volume2, RotateCcw, CheckCircle, Info } from 'lucide-react';
 import { FormattedText } from '../utils/textFormatting';
 import { useHiraganaInput, getFinalHiraganaValue } from '../utils/romajiConverter';
-import DevPanel from './DevPanel';
 
 const ReviewSession = ({ srs, wanoKuniData, onComplete, onBack }) => {
   const [fixedReviewItems, setFixedReviewItems] = useState(null); // Items fixes de la session
@@ -25,11 +24,6 @@ const ReviewSession = ({ srs, wanoKuniData, onComplete, onBack }) => {
   const [answerHint, setAnswerHint] = useState(null);
   const [attemptCount, setAttemptCount] = useState(0);
   const [hasUsedSecondChance, setHasUsedSecondChance] = useState(false);
-
-  // Force refresh function for dev panel
-  const handleRefresh = () => {
-    window.location.reload();
-  };
 
   // Initialize review session ONCE only
   useEffect(() => {
@@ -583,12 +577,6 @@ const ReviewSession = ({ srs, wanoKuniData, onComplete, onBack }) => {
           </button>
         </div>
 
-        {/* Dev Panel */}
-        <DevPanel 
-          srs={srs}
-          wanoKuniData={wanoKuniData}
-          onRefresh={handleRefresh}
-        />
       </div>
     </div>
   );

@@ -6,7 +6,12 @@
       "Bash(grep:*)",
       "Bash(mv:*)",
       "Bash(move:*)",
-      "Bash(npm install:*)"
+      "Bash(npm install:*)",
+      "Bash(npm cache clean:*)",
+      "Bash(rm:*)",
+      "Bash(set PORT=3001)",
+      "Bash($env:PORT=3001)",
+      "Bash(taskkill:*)"
     ],
     "deny": []
   }

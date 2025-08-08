@@ -3,7 +3,6 @@ import { Home, Play, BookOpen, Trophy, Clock, Settings, BarChart3, RotateCcw, La
 import { hardReset } from '../utils/resetData';
 import ItemDetailModal from './ItemDetailModal';
 import AdvancedStats from './AdvancedStats';
-import DevPanel from './DevPanel';
 
 const Dashboard = ({ srs, wanoKuniData, onNavigate }) => {
   const stats = srs.getStats();
@@ -14,11 +13,6 @@ const Dashboard = ({ srs, wanoKuniData, onNavigate }) => {
   const [refreshKey, setRefreshKey] = useState(0);
   const [showAdvancedStats, setShowAdvancedStats] = useState(false);
 
-  // Force refresh function for dev panel
-  const handleRefresh = () => {
-    setRefreshKey(prev => prev + 1);
-    window.location.reload();
-  };
 
   // Raccourci clavier pour reset (Ctrl+Shift+R)
   useEffect(() => {
@@ -629,12 +623,6 @@ const Dashboard = ({ srs, wanoKuniData, onNavigate }) => {
         />
       )}
 
-      {/* Dev Panel */}
-      <DevPanel 
-        srs={srs}
-        wanoKuniData={wanoKuniData}
-        onRefresh={handleRefresh}
-      />
     </div>
   );
 };

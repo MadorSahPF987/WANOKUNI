@@ -3,7 +3,6 @@ import { Home, ChevronRight, Volume2, BookOpen, CheckCircle, ArrowRight, Users, 
 import { useBatchLearning } from '../hooks/useBatchLearning';
 import { FormattedText } from '../utils/textFormatting';
 import { useHiraganaInput, getFinalHiraganaValue } from '../utils/romajiConverter';
-import DevPanel from './DevPanel';
 
 const LessonSession = ({ srs, wanoKuniData, onComplete, onBack }) => {
   const [allLessons, setAllLessons] = useState(null);
@@ -23,11 +22,6 @@ const LessonSession = ({ srs, wanoKuniData, onComplete, onBack }) => {
   const [attemptCount, setAttemptCount] = useState(0);
   const [hasUsedSecondChance, setHasUsedSecondChance] = useState(false);
 
-  // Force refresh function for dev panel
-  const handleRefresh = () => {
-    window.location.reload();
-  };
-  
   // Utiliser le système de batch learning
   const batchLearning = useBatchLearning(allLessons, 5);
 
@@ -639,12 +633,6 @@ const LessonSession = ({ srs, wanoKuniData, onComplete, onBack }) => {
           </button>
         </div>
 
-        {/* Dev Panel */}
-        <DevPanel 
-          srs={srs}
-          wanoKuniData={wanoKuniData}
-          onRefresh={handleRefresh}
-        />
       </div>
     </div>
   );
