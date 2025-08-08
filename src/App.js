@@ -12,7 +12,7 @@ import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { useWanoKuniData } from './hooks/useWanoKuniData';
 import { useSRS } from './hooks/useSRS';
 import { migrateAnonymousData } from './utils/storage';
-import { User, LogIn } from 'lucide-react';
+import { User, LogIn, Cloud, CloudOff } from 'lucide-react';
 
 function AppContent() {
   const { currentUser } = useAuth();
@@ -21,6 +21,7 @@ function AppContent() {
   const [showUserProfile, setShowUserProfile] = useState(false);
   const { wanoKuniData, loadData, isLoading } = useWanoKuniData(currentUser?.uid);
   const srs = useSRS(wanoKuniData, currentUser?.uid);
+  const { isLoadingFromCloud, lastSyncTime } = srs;
 
   // Migration des données anonymes lors de la première connexion
   useEffect(() => {
@@ -39,6 +40,44 @@ function AppContent() {
   const handleDataLoad = (data) => {
     loadData(data);
     setScreen('dashboard');
+  };
+
+  const renderSyncIndicator = () => {
+    if (!currentUser) return null;
+    
+    const formatSyncTime = () => {
+      if (!lastSyncTime) return 'Jamais';
+      const now = new Date();
+      const sync = new Date(lastSyncTime);
+      const diffMinutes = Math.floor((now - sync) / (1000 * 60));
+      
+      if (diffMinutes < 1) return 'À l\'instant';
+      if (diffMinutes < 60) return `Il y a ${diffMinutes}min`;
+      const diffHours = Math.floor(diffMinutes / 60);
+      if (diffHours < 24) return `Il y a ${diffHours}h`;
+      return sync.toLocaleDateString();
+    };
+
+    return (
+      <div className="fixed top-4 left-4 z-40 flex items-center gap-2 bg-white/10 backdrop-blur-md text-white px-3 py-2 rounded-full text-sm">
+        {isLoadingFromCloud ? (
+          <>
+            <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+            <span>Sync...</span>
+          </>
+        ) : lastSyncTime ? (
+          <>
+            <Cloud className="w-4 h-4 text-green-400" />
+            <span>Sync: {formatSyncTime()}</span>
+          </>
+        ) : (
+          <>
+            <CloudOff className="w-4 h-4 text-yellow-400" />
+            <span>Mode local</span>
+          </>
+        )}
+      </div>
+    );
   };
 
   const renderAuthButton = () => {
@@ -101,6 +140,7 @@ function AppContent() {
   return (
     <ErrorBoundary onReset={() => setScreen('home')}>
       <div className="App relative">
+        {renderSyncIndicator()}
         {renderAuthButton()}
         {renderScreen()}
         

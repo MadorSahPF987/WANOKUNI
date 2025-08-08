@@ -1,31 +1,122 @@
 import { useState, useCallback, useEffect } from 'react';
 import { calculateNextReview, shuffleArray } from '../utils/srs';
 import { saveToStorage, loadFromStorage } from '../utils/storage';
+import { 
+  loadProgressFromFirestore, 
+  saveProgressToFirestore, 
+  migrateToFirestore,
+  subscribeToProgressUpdates,
+  syncData 
+} from '../utils/firestoreSync';
 
 export const useSRS = (wanoKuniData, userId = null) => {
   const [userProgress, setUserProgress] = useState({});
   const [currentLevel, setCurrentLevel] = useState(1);
+  const [isLoadingFromCloud, setIsLoadingFromCloud] = useState(false);
+  const [lastSyncTime, setLastSyncTime] = useState(null);
 
-  // Load progress from localStorage
+  // Load progress - priorité Firestore puis localStorage
   useEffect(() => {
-    const savedProgress = loadFromStorage('wanokuni_progress', userId);
-    const savedLevel = loadFromStorage('wanokuni_level', userId);
-    
-    if (savedProgress) {
-      setUserProgress(savedProgress);
-    }
-    if (savedLevel) {
-      setCurrentLevel(savedLevel);
-    }
+    const loadUserProgress = async () => {
+      if (!userId) {
+        // Mode anonyme - utiliser localStorage uniquement
+        const savedProgress = loadFromStorage('wanokuni_progress');
+        const savedLevel = loadFromStorage('wanokuni_level');
+        
+        if (savedProgress) setUserProgress(savedProgress);
+        if (savedLevel) setCurrentLevel(savedLevel);
+        return;
+      }
+
+      setIsLoadingFromCloud(true);
+      
+      try {
+        // 1. Essayer de charger depuis Firestore
+        const cloudData = await loadProgressFromFirestore(userId);
+        
+        if (cloudData && cloudData.progress && Object.keys(cloudData.progress).length > 0) {
+          // Données cloud trouvées
+          setUserProgress(cloudData.progress);
+          setCurrentLevel(cloudData.currentLevel || 1);
+          setLastSyncTime(cloudData.lastUpdated);
+          console.log('✅ Données chargées depuis Firestore');
+          
+          // Sauvegarder localement pour cache
+          saveToStorage('wanokuni_progress', cloudData.progress, userId);
+          saveToStorage('wanokuni_level', cloudData.currentLevel || 1, userId);
+        } else {
+          // Pas de données cloud - charger localStorage et migrer
+          const savedProgress = loadFromStorage('wanokuni_progress', userId);
+          const savedLevel = loadFromStorage('wanokuni_level', userId);
+          
+          if (savedProgress && Object.keys(savedProgress).length > 0) {
+            setUserProgress(savedProgress);
+            setCurrentLevel(savedLevel || 1);
+            
+            // Migrer vers Firestore en arrière-plan
+            migrateToFirestore(userId);
+          }
+        }
+      } catch (error) {
+        console.error('❌ Erreur chargement cloud, fallback localStorage:', error);
+        // Fallback vers localStorage
+        const savedProgress = loadFromStorage('wanokuni_progress', userId);
+        const savedLevel = loadFromStorage('wanokuni_level', userId);
+        
+        if (savedProgress) setUserProgress(savedProgress);
+        if (savedLevel) setCurrentLevel(savedLevel || 1);
+      } finally {
+        setIsLoadingFromCloud(false);
+      }
+    };
+
+    loadUserProgress();
   }, [userId]);
 
-  // Save progress to localStorage
+  // Synchronisation automatique vers Firestore
   useEffect(() => {
-    if (Object.keys(userProgress).length > 0) {
-      saveToStorage('wanokuni_progress', userProgress, userId);
-      saveToStorage('wanokuni_level', currentLevel, userId);
-    }
+    const performSync = async () => {
+      if (!userId || Object.keys(userProgress).length === 0) return;
+      
+      try {
+        await syncData(userId, { progress: userProgress, currentLevel });
+        setLastSyncTime(new Date());
+      } catch (error) {
+        console.error('❌ Erreur synchronisation:', error);
+      }
+    };
+
+    // Débounce pour éviter trop d'appels
+    const timeoutId = setTimeout(performSync, 2000);
+    return () => clearTimeout(timeoutId);
   }, [userProgress, currentLevel, userId]);
+
+  // Écoute en temps réel des changements (optionnel - pour synchronisation multi-appareils)
+  useEffect(() => {
+    if (!userId) return;
+
+    console.log('🔄 Activation de la synchronisation en temps réel');
+    const unsubscribe = subscribeToProgressUpdates(userId, (cloudData) => {
+      // Vérifier si les données cloud sont plus récentes
+      if (cloudData.lastUpdated && lastSyncTime) {
+        const cloudTime = cloudData.lastUpdated.toDate ? cloudData.lastUpdated.toDate() : new Date(cloudData.lastUpdated);
+        const localTime = new Date(lastSyncTime);
+        
+        if (cloudTime > localTime) {
+          console.log('📥 Mise à jour depuis un autre appareil détectée');
+          setUserProgress(cloudData.progress);
+          setCurrentLevel(cloudData.currentLevel || 1);
+          setLastSyncTime(cloudTime);
+          
+          // Mettre à jour le cache local
+          saveToStorage('wanokuni_progress', cloudData.progress, userId);
+          saveToStorage('wanokuni_level', cloudData.currentLevel || 1, userId);
+        }
+      }
+    });
+
+    return unsubscribe;
+  }, [userId, lastSyncTime]);
 
   // Initialize user progress with level 1 items in lesson state
   useEffect(() => {
@@ -754,6 +845,9 @@ export const useSRS = (wanoKuniData, userId = null) => {
     completeLesson,
     getCurrentLevel,
     getUserProgress,
-    checkLevelProgression
+    checkLevelProgression,
+    // Informations de synchronisation
+    isLoadingFromCloud,
+    lastSyncTime
   };
 };

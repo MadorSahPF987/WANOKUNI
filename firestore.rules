@@ -1,0 +1,21 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Règles pour les données de progression utilisateur
+    match /userProgress/{userId} {
+      // Un utilisateur ne peut lire/écrire que ses propres données
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+    
+    // Règles pour les données utilisateur (WanoKuni data backup)
+    match /userData/{userId} {
+      // Un utilisateur ne peut lire/écrire que ses propres données
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+    
+    // Bloquer tout autre accès
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
