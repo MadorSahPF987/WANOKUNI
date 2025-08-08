@@ -18,9 +18,13 @@ const getUserDataDoc = (userId) => doc(db, 'userData', userId);
 
 // Sauvegarde des données de progression SRS dans Firestore
 export const saveProgressToFirestore = async (userId, progressData, currentLevel) => {
-  if (!userId) return;
+  if (!userId) {
+    console.warn('⚠️ saveProgressToFirestore: pas d\'userId');
+    return;
+  }
   
   try {
+    console.log('🔄 Sauvegarde Firestore...', { userId, itemCount: Object.keys(progressData).length, currentLevel });
     const progressDoc = getUserProgressDoc(userId);
     await setDoc(progressDoc, {
       progress: progressData,
@@ -31,31 +35,42 @@ export const saveProgressToFirestore = async (userId, progressData, currentLevel
     console.log('✅ Progression sauvegardée dans Firestore');
   } catch (error) {
     console.error('❌ Erreur sauvegarde Firestore:', error);
+    console.error('❌ Details:', { userId, progressDataSize: JSON.stringify(progressData).length });
     throw error;
   }
 };
 
 // Chargement des données de progression depuis Firestore
 export const loadProgressFromFirestore = async (userId) => {
-  if (!userId) return null;
+  if (!userId) {
+    console.warn('⚠️ loadProgressFromFirestore: pas d\'userId');
+    return null;
+  }
   
   try {
+    console.log('🔄 Chargement Firestore...', { userId });
     const progressDoc = getUserProgressDoc(userId);
     const docSnapshot = await getDoc(progressDoc);
     
     if (docSnapshot.exists()) {
       const data = docSnapshot.data();
-      console.log('✅ Progression chargée depuis Firestore');
+      console.log('✅ Progression chargée depuis Firestore', { 
+        itemCount: Object.keys(data.progress || {}).length,
+        currentLevel: data.currentLevel 
+      });
       return {
         progress: data.progress || {},
         currentLevel: data.currentLevel || 1,
         lastUpdated: data.lastUpdated
       };
+    } else {
+      console.log('ℹ️ Aucune donnée Firestore trouvée pour cet utilisateur');
     }
     
     return null;
   } catch (error) {
     console.error('❌ Erreur chargement Firestore:', error);
+    console.error('❌ Details:', { userId, error: error.message, code: error.code });
     return null;
   }
 };

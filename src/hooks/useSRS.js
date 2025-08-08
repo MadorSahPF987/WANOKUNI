@@ -18,8 +18,11 @@ export const useSRS = (wanoKuniData, userId = null) => {
   // Load progress - priorité Firestore puis localStorage
   useEffect(() => {
     const loadUserProgress = async () => {
+      console.log('🚀 useSRS: Chargement des données...', { userId });
+      
       if (!userId) {
         // Mode anonyme - utiliser localStorage uniquement
+        console.log('👤 Mode anonyme - localStorage seulement');
         const savedProgress = loadFromStorage('wanokuni_progress');
         const savedLevel = loadFromStorage('wanokuni_level');
         
@@ -28,6 +31,7 @@ export const useSRS = (wanoKuniData, userId = null) => {
         return;
       }
 
+      console.log('🔐 Utilisateur connecté - tentative Firestore...', { userId });
       setIsLoadingFromCloud(true);
       
       try {
