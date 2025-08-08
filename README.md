@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # WanoKuni SRS - Application React
 
 Application de révision espacée (SRS) fidèle à WanoKuni pour l'apprentissage des kanji japonais.
@@ -67,3 +68,8 @@ Upload du fichier JSON généré par le parser WanoKuni avec la structure :
 2. **Dashboard** → voir les stats SRS
 3. **Révisions** → sessions d'apprentissage
 4. **Progression automatique** par niveaux
+=======
+# WanoKuni
+
+Application pour apprendre les Kanji et le Vocabulaire en Japonais avec un système SRS
+>>>>>>> 09daf691bb6045c08d7357dba7ce249aaf00f681

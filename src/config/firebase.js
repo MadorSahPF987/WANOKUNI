@@ -9,12 +9,13 @@ import { getFirestore } from 'firebase/firestore';
 // 2. Sélectionne ton projet 
 // 3. Paramètres du projet → Tes applications → Config
 const firebaseConfig = {
-  apiKey: "REMPLACE_PAR_TA_VRAIE_API_KEY",
-  authDomain: "REMPLACE_PAR_TON_PROJET.firebaseapp.com",
-  projectId: "REMPLACE_PAR_TON_PROJECT_ID",
-  storageBucket: "REMPLACE_PAR_TON_PROJET.appspot.com", 
-  messagingSenderId: "REMPLACE_PAR_TON_SENDER_ID",
-  appId: "REMPLACE_PAR_TON_APP_ID"
+  apiKey: "AIzaSyCxm7U3O2dBBPdthlE-6QE4ZV4v8bRbXmU",
+  authDomain: "wanokuni-d5fae.firebaseapp.com",
+  projectId: "wanokuni-d5fae",
+  storageBucket: "wanokuni-d5fae.firebasestorage.app",
+  messagingSenderId: "751544647589",
+  appId: "1:751544647589:web:0dffd49d3990114dd9b24c",
+  measurementId: "G-GGJFH432XX"
 };
 
 // Initialize Firebase
