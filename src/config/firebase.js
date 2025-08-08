@@ -2,7 +2,7 @@
 import { initializeApp } from 'firebase/app';
 import { getAuth, GoogleAuthProvider } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
-
+import { getAnalytics } from "firebase/analytics";
 // Configuration Firebase
 // 🚨 REMPLACE CES VALEURS par celles de ton projet Firebase :
 // 1. Va sur https://console.firebase.google.com/
@@ -20,7 +20,7 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
-
+const analytics = getAnalytics(app);
 // Initialize Firebase Authentication and get a reference to the service
 export const auth = getAuth(app);
 
