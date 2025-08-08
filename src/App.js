@@ -8,6 +8,7 @@ import LevelBrowser from './components/LevelBrowser';
 import ErrorBoundary from './components/ErrorBoundary';
 import AuthModal from './components/Auth/AuthModal';
 import UserProfile from './components/Auth/UserProfile';
+import DebugPanel from './components/Auth/DebugPanel';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { useWanoKuniData } from './hooks/useWanoKuniData';
 import { useSRS } from './hooks/useSRS';
@@ -153,6 +154,8 @@ function AppContent() {
           isOpen={showUserProfile} 
           onClose={() => setShowUserProfile(false)} 
         />
+        
+        <DebugPanel />
       </div>
     </ErrorBoundary>
   );
