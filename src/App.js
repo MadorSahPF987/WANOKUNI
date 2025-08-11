@@ -9,6 +9,7 @@ import ErrorBoundary from './components/ErrorBoundary';
 import AuthModal from './components/Auth/AuthModal';
 import UserProfile from './components/Auth/UserProfile';
 import DebugPanel from './components/Auth/DebugPanel';
+import VercelDebug from './components/Auth/VercelDebug';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { useWanoKuniData } from './hooks/useWanoKuniData';
 import { useSRS } from './hooks/useSRS';
@@ -141,6 +142,7 @@ function AppContent() {
   return (
     <ErrorBoundary onReset={() => setScreen('home')}>
       <div className="App relative">
+        <VercelDebug />
         {renderSyncIndicator()}
         {renderAuthButton()}
         {renderScreen()}
